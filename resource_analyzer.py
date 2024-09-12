@@ -63,7 +63,7 @@ class cpu(object):
 class memory(object):
         def __init__(self):
 		pass
-
+		
 	def pid_usage(self, pid):
 		pid = str(pid)
 		cmd1 = Popen(["pmap -d " + pid], shell=True, stdout=PIPE)
