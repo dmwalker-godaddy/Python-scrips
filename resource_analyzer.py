@@ -47,15 +47,15 @@ class cpu(object):
 		sys = str(sys)
 		io = str(io)
 			
-		print "According to iostat data on average the CPU is at " + usage + "% utilization."
-		print "According to iostat data on average " + user + "% of the CPU usage is user."
-		print "According to iostat data on average " + sys + "% of the CPU usage is sys."
-		print "According to iostat data on average " + io + "% of the CPU usage is IO.\n"
+		print("According to iostat data on average the CPU is at " + usage + "% utilization.")
+		print("According to iostat data on average " + user + "% of the CPU usage is user.")
+		print("According to iostat data on average " + sys + "% of the CPU usage is sys.")
+		print ("According to iostat data on average " + io + "% of the CPU usage is IO.\n")
 
 
 	def check_user_cpu(self, user):
                 user = str(user)
-                print "The user that has consumed the most cpu based on the process accounting of previously executed commands is " + user + ". Here is a snapshot of this user's processes: \n"
+                print("The user that has consumed the most cpu based on the process accounting of previously executed commands is " + user + ". Here is a snapshot of this user's processes: \n")
                 user_procs = subprocess.call(['ps', '-U', user, '-u', user, 'u'])
 
 				
@@ -86,13 +86,13 @@ class io_wait(object):
 		user4 = str(user4)
 		user5 = str(user5)		
 		
-		print "The system has run iotop in batch mode 5 times. The following users were using the most IO during each iteration: \n"
+		print("The system has run iotop in batch mode 5 times. The following users were using the most IO during each iteration: \n")
 
 		user_average = [user1, user2, user3, user4, user5]
 		for user in user_average:
-			print user
+			print(user)
 		
-		print "\n"
+		print("\n")
 		pass
 
 #If I have a network specific function to run, I'll define this later
@@ -225,81 +225,81 @@ nfs_blk_wps = float(resource().calculate(commands['nfs_blk_wps']))
 issue_check = 0
 
 #Start with displaying system load, check if it is over recommended threshold
-print "Checking sytem load..."
-print "The aggregate system load is " + str(load_average) + "\n"
+print("Checking sytem load...")
+print("The aggregate system load is " + str(load_average) + "\n")
 if procs_over > 1: 
-	print "There are " + str(cpu_cores) + " CPU cores on this system. There should only be 1 load per core, so over the course of 15 minutes the system load is " + str(procs_over) + " over where it should be. The current 1 minute load is " + str(one_load) + ".\n" 
+	print("There are " + str(cpu_cores) + " CPU cores on this system. There should only be 1 load per core, so over the course of 15 minutes the system load is " + str(procs_over) + " over where it should be. The current 1 minute load is " + str(one_load) + ".\n") 
 	issue_check = issue_check + 1
 
 #CPU checks 
 if cpu_avg_idle < 50:
-	print "Accoring to iostat data the CPU is less than 50% idle. Checking CPU usage...\n"
+	print("Accoring to iostat data the CPU is less than 50% idle. Checking CPU usage...\n")
 	cpu().check_usage(cpu_avg_idle,cpu_avg_sys,cpu_avg_user,cpu_avg_io)
 	issue_check = issue_check + 1
 	
 	if cpu_avg_io > 5:
-		print "Accoring to iostat data the system IO average is above 5% this could be causing perfomance issues.\n"
+		print("Accoring to iostat data the system IO average is above 5% this could be causing perfomance issues.\n")
 		io_wait().top_io_user_average(io_user1, io_user2, io_user3, io_user4, io_user5)
-		print "\n"		
+		print("\n")
 
 	if cpu_avg_user > cpu_avg_sys:
-		print "The CPU user usage is higher than the CPU system usage.\n"
+		print("The CPU user usage is higher than the CPU system usage.\n")
 		cpu().check_user_cpu(top_cpu_user)
-		print "\nThat does not mean that this user is necessarily the problem. Here are the top 10 CPU consuming processes in the current process table:\n"
-		print resource().calculate(commands['top_cpu_procs'])		
-		print "\n"
+		print("\nThat does not mean that this user is necessarily the problem. Here are the top 10 CPU consuming processes in the current process table:\n")
+		print(resource().calculate(commands['top_cpu_procs']))	
+		print("\n")
 
 	if cpu_avg_sys >  cpu_avg_user:
-		print "The CPU system usage is higher than the CPU user usage.\n" 
-		print "\nHere are the top 10 CPU consuming processes:"
-		print resource().calculate(commands['top_cpu_procs'])	
-		print "\n"
+		print("The CPU system usage is higher than the CPU user usage.\n")
+		print("\nHere are the top 10 CPU consuming processes:")
+		print(resource().calculate(commands['top_cpu_procs']))
+		print("\n")
 
  		
 
 #Memory checks:
 if swap_used > 1:
 	issue_check = issue_check + 1
-	print "There is swap in use, checking system memory..."
-	print "There is " + str(total_mem_gig) + "G of memory on the system."
-	print "There is " + str(free_mem) + "kB of free memory available."
-	print "There is " + str(swap_used) + "kB of swap in use."
-	print "The user using the most memory according the process accounting data is " + str(top_mem_user) + "."
-	print "The pid consuming the most memory is " + str(top_mem_pid) + ". This pid's writable/private usage is " + str(pid_mem_usage) + " according to pmap data."
-	print "\n"
-	print "Here is a sorted list of the top 10 memory consuming procs:"
-	print resource().calculate(commands['top_mem_procs'])	
-	print "\n"
+	print("There is swap in use, checking system memory...")
+	print("There is " + str(total_mem_gig) + "G of memory on the system.")
+	print("There is " + str(free_mem) + "kB of free memory available.")
+	print("There is " + str(swap_used) + "kB of swap in use.")
+	print("The user using the most memory according the process accounting data is " + str(top_mem_user) + ".")
+	print("The pid consuming the most memory is " + str(top_mem_pid) + ". This pid's writable/private usage is " + str(pid_mem_usage) + " according to pmap data.")
+	print("\n")
+	print("Here is a sorted list of the top 10 memory consuming procs:")
+	print(resource().calculate(commands['top_mem_procs']))
+	print("\n")
 
 #Network check
 if netstat_total > 1500:
 	issue_check = issue_check + 1
-	print "There are over 1.5k connections in netstat, running network checks..."
-	print "There are " +  str(netstat_tcp) + " tcp connections in netstat"
-	print "There are " +  str(netstat_udp) + " udp connections in netstat"
-	print "Here is alist of the sorted connection types in netstat: \n" 
-	print netstat_con_types
-	print "Here is a sorted list of the IPs with the most connections to the server in netstat: \n" 
-	print netstat_sorted_ips
-	print "\n"
-	print "Calculating ifconfig stats..."
-	print "There are " + str(bytes_received) + " bytes received on the NIC"
-	print "There are " + str(bytes_transfered) + " bytes transfered on the NIC"
-	print "There are " + str(packets_received) + " packets received on the NIC"
-	print "There are " + str(packets_transfered) + " packets transfered on the NIC"
-	print "\n"
-	print "Here is the tail end of  the sar network stats: \n"
-	print network_sar
-	print "\n"
-	print "Parsing data from 3 tcpdumps, 5k packets a piece. this might take a few..."
-	print "Here are the top request domains in the first packet capture: \n"
-	print resource().calculate(commands['tcpdump_top_domains'])
-	print "\n"
-	print "Here are the top source IPs in the second packet capture: \n"
-	print resource().calculate(commands['tcpdump_top_source_ips'])
-	print "\n"
-	print "Here are the top destination IPs in the third packet capture: \n"
-	print resource().calculate(commands['tcpdump_top_dest_ips'])
+	print("There are over 1.5k connections in netstat, running network checks...")
+	print("There are " +  str(netstat_tcp) + " tcp connections in netstat")
+	print("There are " +  str(netstat_udp) + " udp connections in netstat")
+	print("Here is alist of the sorted connection types in netstat: \n" )
+	print(netstat_con_types)
+	print("Here is a sorted list of the IPs with the most connections to the server in netstat: \n")
+	print(netstat_sorted_ips)
+	print("\n")
+	print("Calculating ifconfig stats...")
+	print("There are " + str(bytes_received) + " bytes received on the NIC")
+	print("There are " + str(bytes_transfered) + " bytes transfered on the NIC")
+	print("There are " + str(packets_received) + " packets received on the NIC")
+	print("There are " + str(packets_transfered) + " packets transfered on the NIC")
+	print("\n")
+	print("Here is the tail end of  the sar network stats: \n")
+	print(network_sar)
+	print("\n")
+	print("Parsing data from 3 tcpdumps, 5k packets a piece. this might take a few...")
+	print("Here are the top request domains in the first packet capture: \n")
+	print(resource().calculate(commands['tcpdump_top_domains']))
+	print("\n")
+	print("Here are the top source IPs in the second packet capture: \n")
+	print(resource().calculate(commands['tcpdump_top_source_ips']))
+	print("\n")
+	print("Here are the top destination IPs in the third packet capture: \n")
+	print(resource().calculate(commands['tcpdump_top_dest_ips']))
 
 #General process info -need to figure out the conditions for when this should be displayed
 """
